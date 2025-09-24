@@ -5,6 +5,7 @@ import TrendingSection from "./TrendingSection";
 import SearchBar from "./SearchBar";
 import CategoryDropdown from "./CategoryDropdown";
 import { HistoryMenu } from "./Drawer";
+import { Button } from "./ui/button";
 
 const API_URL = import.meta.env.VITE_NEWS_API_URL;
 const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
@@ -20,6 +21,7 @@ function Cardlist() {
   const [savedFeeds, setSavedFeeds] = useState(
     JSON.parse(localStorage.getItem("savedFeeds")) || []
   );
+  const [loading,setloading]=useState(false);
 
   const pageSize = 8;
   const [history, setHistory] = useState(() => {
@@ -29,7 +31,6 @@ function Cardlist() {
     return JSON.parse(localStorage.getItem("searchHistory")) || [];
   });
 
-  // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [feedName, setFeedName] = useState("");
 
@@ -41,7 +42,6 @@ function Cardlist() {
     });
   };
 
-  // Save new search (recent searches)
   const saveSearch = (query, from, to) => {
     const newSearch = { query, from, to };
 
@@ -58,26 +58,33 @@ function Cardlist() {
     });
   };
 
-  const getNewsData = async () => {
-    let API = "";
-    if (category) {
-      API = `${API_URL}/top-headlines?country=us&category=${category}&pageSize=${pageSize}&page=${page}&apiKey=${API_KEY}`;
-    } else {
-      API = `${API_URL}/everything?q=${encodeURIComponent(
-        searchQuery
-      )}&sortBy=publishedAt&pageSize=${pageSize}&page=${page}&apiKey=${API_KEY}`;
-      if (fromDate) API += `&from=${fromDate}`;
-      if (toDate) API += `&to=${toDate}`;
-    }
 
-    try {
-      const res = await axios.get(API);
-      setNewsData(res.data.articles);
-      setTotalResults(res.data.totalResults);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+const getNewsData = async () => {
+  let API = "";
+  if (category) {
+    API = `${API_URL}/top-headlines?country=us&category=${category}&pageSize=${pageSize}&page=${page}&apiKey=${API_KEY}`;
+  } else {
+    API = `${API_URL}/everything?q=${encodeURIComponent(
+      searchQuery
+    )}&sortBy=publishedAt&pageSize=${pageSize}&page=${page}&apiKey=${API_KEY}`;
+    if (fromDate) API += `&from=${fromDate}`;
+    if (toDate) API += `&to=${toDate}`;
+  }
+
+  try {
+    setloading(true);
+    setNewsData([]); 
+    const res = await axios.get(API);
+    setNewsData(res.data.articles);
+    setTotalResults(res.data.totalResults);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    setloading(false); 
+  }
+};
+
+
 
   const addToHistory = (article) => {
     setHistory((prev) => {
@@ -100,11 +107,13 @@ function Cardlist() {
   return (
     <div className="p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
       {/* Left Side */}
+
       <div className="lg:col-span-3">
         <HistoryMenu history={history} setHistory={setHistory} />
 
-        {/* Search & Save Feed */}
-        <div className="flex items-center space-x-2">
+       
+        <div className="flex items-center justify-between space-x-4">
+          <div>
           <SearchBar
             onSearch={(query, from, to) => {
               setSearchQuery(query || "news");
@@ -118,13 +127,23 @@ function Cardlist() {
               }
             }}
           />
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-green-600 text-white px-4 py-2 mb-6 rounded-md hover:bg-green-700"
-          >
-            Save Feed
-          </button>
         </div>
+<div>         
+               {/* Category Dropdown */}
+                  <CategoryDropdown 
+                 
+                    selectedCategory={category}
+                    onChange={(cat) => {
+                      setCategory(cat);
+                      setSearchQuery("news");
+                      setPage(1);
+                    }}
+                  />
+          </div>
+
+                  {/* News Grid */}
+        </div>
+         <Button className="px-4 py-2  mb-6" variant="outline"  onClick={() => setIsModalOpen(true)}>  Save Feed</Button>
 
         {/* Saved Feeds */}
         {savedFeeds.length > 0 && (
@@ -173,22 +192,29 @@ function Cardlist() {
           </div>
         )}
 
-        {/* Category Dropdown */}
-        <CategoryDropdown
-          selectedCategory={category}
-          onChange={(cat) => {
-            setCategory(cat);
-            setSearchQuery("news");
-            setPage(1);
-          }}
-        />
+   
+        
 
-        {/* News Grid */}
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-          {newsData.map((item, index) => (
-            <NewsCard key={index} data={item} onRead={addToHistory} />
-          ))}
-        </div>
+
+
+<div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+  {loading ? (
+    Array.from({ length: pageSize }).map((_, i) => (
+      <div
+        key={i}
+        className="animate-pulse bg-gray-200 rounded-xl h-40"
+      ></div>
+    ))
+  ) : newsData.length === 0 ? (
+    <p className="text-gray-500 col-span-full text-center">No results found.</p>
+  ) : (
+    newsData.map((item, index) => (
+      <NewsCard key={index} data={item} onRead={addToHistory} />
+    ))
+  )}
+</div>
+
+       
 
         {/* Pagination */}
         <div className="flex justify-center mt-6 space-x-2 items-center">

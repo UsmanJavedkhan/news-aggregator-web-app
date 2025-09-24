@@ -1,19 +1,28 @@
-import React, { useState } from "react";
 
+
+
+import React, { useState } from "react";
 import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import { Calendar } from "./ui/calendar";
+import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import CategoryDropdown from "./CategoryDropdown";
+
 function SearchBar({ onSearch }) {
   const [query, setQuery] = useState("");
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
-  
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+
   const handleSubmit = (e) => {
     e.preventDefault();
- 
-     if (toDate < fromDate) {
-    alert("End date cannot be before start date");
-    return;
-  }
-     onSearch(query, fromDate, toDate);
+
+    if (fromDate && toDate && toDate < fromDate) {
+      alert("End date cannot be before start date");
+      return;
+    }
+    onSearch(query, fromDate ? format(fromDate, "yyyy-MM-dd") : "", toDate ? format(toDate, "yyyy-MM-dd") : "");
   };
 
   return (
@@ -22,41 +31,65 @@ function SearchBar({ onSearch }) {
       className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-6"
     >
       {/* Search input */}
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search news..."
-        className="flex-1 border rounded-md px-4 py-2 ml-9 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      <Input />
+    <Input
+  type="text"
+  value={query}
+  onChange={(e) => setQuery(e.target.value)}
+  placeholder="Search news..."
+  className="flex-1 min-w-[250px] ml-9"
+/>
 
-      {/* From date */}
-      <input
-        type="date"
-        value={fromDate}
-        onChange={(e) => setFromDate(e.target.value)}
-        className="border rounded-md px-3 py-2"
-      />
+      {/* From Date Picker */}
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className="w-[160px] justify-start text-left font-normal"
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {fromDate ? format(fromDate, "yyyy-MM-dd") : <span>From date</span>}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={fromDate}
+            onSelect={setFromDate}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
 
-      {/* To date */}
-      <input
-        type="date"
-        value={toDate}
-        onChange={(e) => setToDate(e.target.value)}
-        className="border rounded-md px-3 py-2"
-      />
-      {/* <Input /> */}
+      {/* To Date Picker */}
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className="w-[160px] justify-start text-left font-normal"
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {toDate ? format(toDate, "yyyy-MM-dd") : <span>To date</span>}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={toDate}
+            onSelect={setToDate}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
 
-      {/* Search Button */}
-      <button
-        type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-      >
-        Search
-      </button>
+    
+
+      <Button type="submit" variant="outline">Search</Button>
+
+        
+    
     </form>
   );
 }
 
 export default SearchBar;
+

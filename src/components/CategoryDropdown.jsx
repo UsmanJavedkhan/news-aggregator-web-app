@@ -1,19 +1,37 @@
 import React from "react";
-import { categories } from "./TrendingSection";
+ import { categories } from "./TrendingSection"; 
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 function CategoryDropdown({ selectedCategory, onChange }) {
   return (
-    <select
-      value={selectedCategory}
-      onChange={(e) => onChange(e.target.value)}
-      className="border px-5 py-2 rounded-md mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
-    >
-      {categories.map((cat) => (
-        <option key={cat} value={cat}>
-          {cat.charAt(0).toUpperCase() + cat.slice(1)}
-        </option>
-      ))}
-    </select>
+    <div className="mb-6 ">
+    <DropdownMenu >
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="capitalize">
+          {selectedCategory || "Select Category"}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>Categories</DropdownMenuLabel>
+        {categories.map((cat) => (
+          <DropdownMenuItem
+            key={cat}
+            className="capitalize cursor-pointer"
+            onClick={() => onChange(cat)}
+          >
+            {cat}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+    </div>
   );
 }
 
