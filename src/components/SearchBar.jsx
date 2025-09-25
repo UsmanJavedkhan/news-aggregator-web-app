@@ -90,7 +90,7 @@ function SearchBar({ onSearch, category, setCategory }) {
         onChange={(cat) => setCategory(cat)}
       />
 
-      <Button type="submit" variant="outline">Search</Button>
+      <Button type="submit" variant="">Search</Button>
     </form>
   );
 }

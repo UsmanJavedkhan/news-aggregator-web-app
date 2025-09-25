@@ -11,6 +11,7 @@ function Input({
   return (
     <input
       type={type}
+      varient
       data-slot="input"
       
       className={cn(
