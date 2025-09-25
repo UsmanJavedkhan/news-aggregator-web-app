@@ -3,7 +3,6 @@ import axios from "axios";
 import NewsCard from "./Newscard";
 import TrendingSection from "./TrendingSection";
 import SearchBar from "./SearchBar";
-import CategoryDropdown from "./CategoryDropdown";
 import { HistoryMenu } from "./Drawer";
 import { Button } from "./ui/button";
 
@@ -133,7 +132,7 @@ const getNewsData = async () => {
         
       
                 
-            <Button className="px-4 py-2  mb-6" variant="outline"  onClick={() => setIsModalOpen(true)}>  Save Feed</Button>
+            <Button className="px-4 py-2  mb-6" variant=""  onClick={() => setIsModalOpen(true)}>  Save Feed</Button>
        
 
 
@@ -212,6 +211,7 @@ const getNewsData = async () => {
 </div>
 
 {/* ✅ Show pagination only if there are results */}
+
 {!loading && newsData.length > 0 && (
   <div className="flex justify-center mt-6 space-x-2 items-center">
     <button
@@ -219,8 +219,8 @@ const getNewsData = async () => {
       onClick={() => setPage(page - 1)}
       className={`px-3 py-1 rounded-md border transition-colors ${
         page === 1
-          ? "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed"
-          : "bg-white text-blue-600 border-blue-600 hover:bg-blue-100"
+         ? "bg-white/80 text-black border-black   cursor-not-allowed"
+          : "bg-white/80 text-black   border-black hover:bg-white"
       }`}
     >
       ←
@@ -233,8 +233,8 @@ const getNewsData = async () => {
           onClick={() => setPage(pageNum)}
           className={`px-3 py-1 rounded-md border transition-colors ${
             pageNum === page
-              ? "bg-blue-600 text-white border-blue-600"
-              : "bg-white text-blue-600 border-blue-600 hover:bg-blue-100"
+               ? "bg-black text-white border-black"   // ✅ Active page style
+          : "bg-white text-black border-black hover:bg-gray-200"
           }`}
         >
           {pageNum}
@@ -247,8 +247,8 @@ const getNewsData = async () => {
       onClick={() => setPage(page + 1)}
       className={`px-3 py-1 rounded-md border transition-colors ${
         page === totalPages
-          ? "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed"
-          : "bg-white text-blue-600 border-blue-600 hover:bg-blue-100"
+          ? "bg-white/80 text-black border-black   cursor-not-allowed"
+          : "bg-white/80 text-black   border-black hover:bg-white"
       }`}
     >
       →
