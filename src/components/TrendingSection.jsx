@@ -14,23 +14,52 @@ export default function TrendingSection({ addToHistory }) {
   const[loadings,setloadings]=useState(false);
   
 
-  const fetchTrending = async () => {
-    try {
-      setloadings(true);
+  // const fetchTrending = async () => {
+  //   try {
+  //     setloadings(true);
 
-      const results = {};
-      for (let cat of categories) {
-        const res = await axios.get(
-          `${API_URL}/top-headlines?country=us&category=${cat}&pageSize=2&apiKey=${API_KEY}`
-        );
-        results[cat] = res.data.articles[0];
-      }
-      setloadings(false);
-      setTrending(results);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  //     const results = {};
+  //     for (let cat of categories) {
+  //       const res = await axios.get(
+  //         `${API_URL}/top-headlines?country=us&category=${cat}&pageSize=2&apiKey=${API_KEY}`
+  //       );
+  //       results[cat] = res.data.articles[0];
+  //     }
+  //     setloadings(false);
+  //     setTrending(results);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+
+
+const fetchTrending = async () => {
+  try {
+    setloadings(true);
+
+    const requests = categories.map((cat) =>
+      axios.get(
+        `${API_URL}/top-headlines?country=us&category=${cat}&pageSize=2&apiKey=${API_KEY}`
+      )
+    );
+
+    const responses = await Promise.all(requests);
+
+    const results = {};
+    categories.forEach((cat, i) => {
+      results[cat] = responses[i].data.articles[0];
+    });
+
+    setTrending(results);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setloadings(false);
+  }
+};
+
+
+
 
   useEffect(() => {
     fetchTrending();

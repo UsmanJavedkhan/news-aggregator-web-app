@@ -1,6 +1,4 @@
 
-
-
 import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -10,7 +8,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import CategoryDropdown from "./CategoryDropdown";
 
-function SearchBar({ onSearch }) {
+function SearchBar({ onSearch, category, setCategory }) {
   const [query, setQuery] = useState("");
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
@@ -22,22 +20,27 @@ function SearchBar({ onSearch }) {
       alert("End date cannot be before start date");
       return;
     }
-    onSearch(query, fromDate ? format(fromDate, "yyyy-MM-dd") : "", toDate ? format(toDate, "yyyy-MM-dd") : "");
+
+    onSearch(
+      query,
+      fromDate ? format(fromDate, "yyyy-MM-dd") : "",
+      toDate ? format(toDate, "yyyy-MM-dd") : ""
+    );
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-6"
+      className="flex flex-col sm:flex-row items-center ml-9  space-y-2 sm:space-y-0 sm:space-x-2 mb-6"
     >
       {/* Search input */}
-    <Input
-  type="text"
-  value={query}
-  onChange={(e) => setQuery(e.target.value)}
-  placeholder="Search news..."
-  className="flex-1 min-w-[250px] ml-9"
-/>
+      <Input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search news..."
+        className="flex-1 min-w-[250px] ml-2"
+      />
 
       {/* From Date Picker */}
       <Popover>
@@ -81,15 +84,17 @@ function SearchBar({ onSearch }) {
         </PopoverContent>
       </Popover>
 
-    
+      {/* Category Dropdown */}
+      <CategoryDropdown
+        selectedCategory={category}
+        onChange={(cat) => setCategory(cat)}
+      />
 
       <Button type="submit" variant="outline">Search</Button>
-
-        
-    
     </form>
   );
 }
 
 export default SearchBar;
+
 

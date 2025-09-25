@@ -112,43 +112,39 @@ const getNewsData = async () => {
         <HistoryMenu history={history} setHistory={setHistory} />
 
        
-        <div className="flex items-center justify-between space-x-4">
-          <div>
+        <div className="flex items-center  space-x-4">
           <SearchBar
-            onSearch={(query, from, to) => {
-              setSearchQuery(query || "news");
-              setFromDate(from);
-              setToDate(to);
-              setCategory("");
-              setPage(1);
+  category={category}
+  setCategory={setCategory}
+  onSearch={(query, from, to) => {
+    setSearchQuery(query || "news");
+    setFromDate(from);
+    setToDate(to);
+    setCategory(category); // keep selected category
+    setPage(1);
 
-              if (query && query.trim() !== "") {
-                saveSearch(query, from, to);
-              }
-            }}
-          />
-        </div>
-<div>         
-               {/* Category Dropdown */}
-                  <CategoryDropdown 
+    if (query && query.trim() !== "") {
+      saveSearch(query, from, to);
+    }
+  }}
+/>
+
+        
+        
+      
+                
+            <Button className="px-4 py-2  mb-6" variant="outline"  onClick={() => setIsModalOpen(true)}>  Save Feed</Button>
+       
+
+
                  
-                    selectedCategory={category}
-                    onChange={(cat) => {
-                      setCategory(cat);
-                      setSearchQuery("news");
-                      setPage(1);
-                    }}
-                  />
-          </div>
-
-                  {/* News Grid */}
+       
         </div>
-         <Button className="px-4 py-2  mb-6" variant="outline"  onClick={() => setIsModalOpen(true)}>  Save Feed</Button>
 
         {/* Saved Feeds */}
         {savedFeeds.length > 0 && (
           <div className="mt-4 bg-gray-50 p-3 rounded-lg shadow">
-            <h3 className="text-sm font-semibold mb-2">Saved Feeds</h3>
+            <h3 className="text-sm font-semibold mb-2">Personel Feeds</h3>
             <ul className="space-y-2">
               {savedFeeds.map((feed, index) => (
                 <li
@@ -196,7 +192,6 @@ const getNewsData = async () => {
         
 
 
-
 <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
   {loading ? (
     Array.from({ length: pageSize }).map((_, i) => (
@@ -206,7 +201,9 @@ const getNewsData = async () => {
       ></div>
     ))
   ) : newsData.length === 0 ? (
-    <p className="text-gray-500 col-span-full text-center">No results found.</p>
+    <p className="text-gray-500 col-span-full text-center">
+      No results found.
+    </p>
   ) : (
     newsData.map((item, index) => (
       <NewsCard key={index} data={item} onRead={addToHistory} />
@@ -214,51 +211,51 @@ const getNewsData = async () => {
   )}
 </div>
 
-       
+{/* ✅ Show pagination only if there are results */}
+{!loading && newsData.length > 0 && (
+  <div className="flex justify-center mt-6 space-x-2 items-center">
+    <button
+      disabled={page === 1}
+      onClick={() => setPage(page - 1)}
+      className={`px-3 py-1 rounded-md border transition-colors ${
+        page === 1
+          ? "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed"
+          : "bg-white text-blue-600 border-blue-600 hover:bg-blue-100"
+      }`}
+    >
+      ←
+    </button>
 
-        {/* Pagination */}
-        <div className="flex justify-center mt-6 space-x-2 items-center">
-          <button
-            disabled={page === 1}
-            onClick={() => setPage(page - 1)}
-            className={`px-3 py-1 rounded-md border transition-colors ${
-              page === 1
-                ? "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed"
-                : "bg-white text-blue-600 border-blue-600 hover:bg-blue-100"
-            }`}
-          >
-            ←
-          </button>
+    {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(
+      (pageNum) => (
+        <button
+          key={pageNum}
+          onClick={() => setPage(pageNum)}
+          className={`px-3 py-1 rounded-md border transition-colors ${
+            pageNum === page
+              ? "bg-blue-600 text-white border-blue-600"
+              : "bg-white text-blue-600 border-blue-600 hover:bg-blue-100"
+          }`}
+        >
+          {pageNum}
+        </button>
+      )
+    )}
 
-          {Array.from(
-            { length: endPage - startPage + 1 },
-            (_, i) => startPage + i
-          ).map((pageNum) => (
-            <button
-              key={pageNum}
-              onClick={() => setPage(pageNum)}
-              className={`px-3 py-1 rounded-md border transition-colors ${
-                pageNum === page
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-blue-600 border-blue-600 hover:bg-blue-100"
-              }`}
-            >
-              {pageNum}
-            </button>
-          ))}
+    <button
+      disabled={page === totalPages}
+      onClick={() => setPage(page + 1)}
+      className={`px-3 py-1 rounded-md border transition-colors ${
+        page === totalPages
+          ? "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed"
+          : "bg-white text-blue-600 border-blue-600 hover:bg-blue-100"
+      }`}
+    >
+      →
+    </button>
+  </div>
+)}
 
-          <button
-            disabled={page === totalPages}
-            onClick={() => setPage(page + 1)}
-            className={`px-3 py-1 rounded-md border transition-colors ${
-              page === totalPages
-                ? "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed"
-                : "bg-white text-blue-600 border-blue-600 hover:bg-blue-100"
-            }`}
-          >
-            →
-          </button>
-        </div>
       </div>
 
       {/* Right Side */}

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 function CategoryDropdown({ selectedCategory, onChange }) {
   return (
-    <div className="mb-6 ">
+    <div >
     <DropdownMenu >
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="capitalize">
